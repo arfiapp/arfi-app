@@ -29,7 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Providers>
           <Navbar />
           {/* Desktop: single bar ~52px | Mobile: two bars ~94px */}
-          <div className="pt-[94px] md:pt-[52px]">
+          <div className="pt-[102px] md:pt-[52px]">
             {children}
           </div>
 

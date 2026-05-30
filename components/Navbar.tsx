@@ -165,7 +165,7 @@ export function Navbar() {
 
       {/* Row 2 */}
       <div
-        className="md:hidden fixed top-[54px] left-0 right-0 z-40 flex items-center gap-1 px-3 py-2 overflow-x-auto"
+        className="md:hidden fixed top-[62px] left-0 right-0 z-40 flex items-center gap-1 px-3 py-2 overflow-x-auto"
         style={{
           background: "rgba(13, 0, 21, 0.85)",
           backdropFilter: "blur(16px)",
