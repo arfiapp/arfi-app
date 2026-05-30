@@ -2,7 +2,7 @@ import { SwapCard } from "@/components/SwapCard";
 
 export default function SwapPage() {
   return (
-    <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center px-4 py-8">
+    <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center px-4 py-6 sm:py-8">
       <SwapCard />
 
       <p className="mt-6 text-center text-xs" style={{ color: "rgba(192,132,252,0.4)" }}>

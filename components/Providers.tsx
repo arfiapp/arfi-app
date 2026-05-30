@@ -17,13 +17,14 @@ export function Providers({ children }: PropsWithChildren) {
   }, []);
 
   return (
-    <WagmiProvider config={wagmiConfig} reconnectOnMount={false}>
+    <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
           theme={darkTheme({
-            accentColor: "#1a9e7a",
-            accentColorForeground: "#0d1b2e",
-            borderRadius: "large"
+            accentColor: "#a855f7",
+            accentColorForeground: "#ffffff",
+            borderRadius: "large",
+            overlayBlur: "small"
           })}
         >
           {children}

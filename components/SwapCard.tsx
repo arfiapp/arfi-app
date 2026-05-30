@@ -84,12 +84,12 @@ export function SwapCard() {
   }, [amountIn, isConnected, isReady, wrongChain, sellSwappable, hasEnoughForGas, status, tokenIn.decimals]);
 
   return (
-    <div className="w-full max-w-sm">
-      <div className="glass-card p-5">
+    <div className="w-full max-w-sm sm:max-w-sm">
+      <div className="glass-card p-4 sm:p-5">
 
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-display text-lg font-bold text-textPrimary">Swap</h2>
+          <h2 className="font-display text-base sm:text-lg font-bold text-textPrimary">Swap</h2>
           <div className="flex items-center gap-1.5">
             <button
               type="button"
@@ -134,7 +134,7 @@ export function SwapCard() {
               placeholder="0"
               value={amountIn}
               onChange={e => { setAmountIn(sanitizeAmountInput(e.target.value)); reset(); }}
-              className="min-w-0 flex-1 bg-transparent text-2xl font-semibold text-textPrimary outline-none placeholder:opacity-30"
+              className="min-w-0 flex-1 bg-transparent text-xl sm:text-2xl font-semibold text-textPrimary outline-none placeholder:opacity-30"
             />
             <TokenSelector
               selected={tokenIn}
@@ -186,7 +186,7 @@ export function SwapCard() {
             )}
           </div>
           <div className="flex items-center gap-3">
-            <div className="min-w-0 flex-1 text-2xl font-semibold text-textPrimary">
+            <div className="min-w-0 flex-1 text-xl sm:text-2xl font-semibold text-textPrimary">
               {quoteLoading ? (
                 <span className="animate-pulse opacity-50">…</span>
               ) : (
