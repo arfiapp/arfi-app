@@ -28,8 +28,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="antialiased">
         <Providers>
           <Navbar />
-          {/* Desktop: single bar ~52px | Mobile: two bars ~88px */}
-          <div className="pt-[88px] md:pt-[52px]">
+          {/* Desktop: single bar ~52px | Mobile: two bars ~94px */}
+          <div className="pt-[94px] md:pt-[52px]">
             {children}
           </div>
 
