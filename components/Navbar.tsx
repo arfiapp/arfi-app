@@ -21,7 +21,6 @@ function shortenAddress(addr: string) {
   return `${addr.slice(0, 5)}...${addr.slice(-4)}`;
 }
 
-/** Arfi logo */
 function ArfiLogo() {
   return (
     <Image
@@ -89,19 +88,74 @@ function WalletArea() {
   );
 }
 
+function NavLinks({ pathname }: { pathname: string }) {
+  return (
+    <>
+      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+        const active = pathname === href || (href === "/swap" && pathname === "/");
+        return (
+          <Link
+            key={href}
+            href={href}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap"
+            style={{
+              color: active ? "#f3e8ff" : "rgba(192,132,252,0.65)",
+              background: active ? "rgba(168,85,247,0.2)" : "transparent",
+              border: active ? "1px solid rgba(168,85,247,0.3)" : "1px solid transparent",
+            }}
+          >
+            <Icon className="h-4 w-4 shrink-0" />
+            <span>{label}</span>
+          </Link>
+        );
+      })}
+    </>
+  );
+}
+
+const BAR_STYLE = {
+  background: "rgba(13, 0, 21, 0.9)",
+  backdropFilter: "blur(20px)",
+  borderBottom: "1px solid rgba(168, 85, 247, 0.12)",
+};
+
 export function Navbar() {
   const pathname = usePathname();
 
   return (
     <>
-      {/* ── Top bar: Logo + Wallet ─────────────────────────────────────── */}
+      {/* ══════════════════════════════════════════════════════════════════
+          DESKTOP (md+): single bar — Logo | Nav links | Wallet
+      ══════════════════════════════════════════════════════════════════ */}
+      <nav
+        className="hidden md:flex fixed top-0 left-0 right-0 z-50 items-center justify-between px-6 py-3"
+        style={BAR_STYLE}
+      >
+        {/* Logo */}
+        <Link href="/swap" className="flex items-center select-none shrink-0" aria-label="Arfi">
+          <ArfiLogo />
+        </Link>
+
+        {/* Nav links — centered */}
+        <div className="flex items-center gap-1">
+          <NavLinks pathname={pathname} />
+        </div>
+
+        {/* Wallet */}
+        <div className="shrink-0">
+          <WalletArea />
+        </div>
+      </nav>
+
+      {/* ══════════════════════════════════════════════════════════════════
+          MOBILE (<md): two rows
+          Row 1: Logo | Wallet
+          Row 2: Nav tabs (scrollable)
+      ══════════════════════════════════════════════════════════════════ */}
+      {/* Row 1 */}
       <div
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-2.5"
-        style={{
-          background: "rgba(13, 0, 21, 0.9)",
-          backdropFilter: "blur(20px)",
-          borderBottom: "1px solid rgba(168, 85, 247, 0.12)"
-        }}
+        className="md:hidden fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-2.5"
+        style={BAR_STYLE}
       >
         <Link href="/swap" className="flex items-center select-none" aria-label="Arfi">
           <ArfiLogo />
@@ -109,35 +163,17 @@ export function Navbar() {
         <WalletArea />
       </div>
 
-      {/* ── Nav tabs: below top bar ────────────────────────────────────── */}
+      {/* Row 2 */}
       <div
-        className="fixed top-[48px] left-0 right-0 z-40 flex items-center gap-1 px-3 py-2 overflow-x-auto"
+        className="md:hidden fixed top-[48px] left-0 right-0 z-40 flex items-center gap-1 px-3 py-2 overflow-x-auto"
         style={{
           background: "rgba(13, 0, 21, 0.85)",
           backdropFilter: "blur(16px)",
           borderBottom: "1px solid rgba(168, 85, 247, 0.1)",
           scrollbarWidth: "none",
-          msOverflowStyle: "none"
         }}
       >
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href || (href === "/swap" && pathname === "/");
-          return (
-            <Link
-              key={href}
-              href={href}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap shrink-0"
-              style={{
-                color: active ? "#f3e8ff" : "rgba(192,132,252,0.65)",
-                background: active ? "rgba(168,85,247,0.2)" : "transparent",
-                border: active ? "1px solid rgba(168,85,247,0.3)" : "1px solid transparent"
-              }}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-              <span>{label}</span>
-            </Link>
-          );
-        })}
+        <NavLinks pathname={pathname} />
       </div>
     </>
   );
