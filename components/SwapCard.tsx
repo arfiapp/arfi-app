@@ -3,8 +3,9 @@
 import { motion } from "framer-motion";
 import { ArrowUpDown, Settings, RefreshCw } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAccount, useChainId } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { arcTestnet } from "@/lib/arc-chain";
 import { ensureArcChain } from "@/lib/ensure-arc-chain";
 import { sanitizeAmountInput, parseTokenAmount, formatAmountForInput } from "@/lib/format";
@@ -257,19 +258,31 @@ export function SwapCard() {
           )}
         </div>
 
-        {/* Swap button */}
-        <button
-          type="button"
-          onClick={() => void handleSwap()}
-          disabled={!isConnected || swapDisabled}
-          className="swap-cta mt-4"
-        >
-          {!isConnected
-            ? "Connect Wallet"
-            : status === "loading"
-            ? "Swapping…"
-            : "Swap"}
-        </button>
+        {/* Swap / Connect button */}
+        {!isConnected ? (
+          <ConnectButton.Custom>
+            {({ openConnectModal, mounted }) =>
+              mounted ? (
+                <button
+                  type="button"
+                  onClick={openConnectModal}
+                  className="swap-cta mt-4"
+                >
+                  Connect Wallet
+                </button>
+              ) : null
+            }
+          </ConnectButton.Custom>
+        ) : (
+          <button
+            type="button"
+            onClick={() => void handleSwap()}
+            disabled={swapDisabled}
+            className="swap-cta mt-4"
+          >
+            {status === "loading" ? "Swapping…" : "Swap"}
+          </button>
+        )}
 
         {/* Status message */}
         {status !== "idle" && message && (

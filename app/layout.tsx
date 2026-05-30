@@ -28,8 +28,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="antialiased">
         <Providers>
           <Navbar />
-          {/* push content below fixed navbar (top bar + tab bar = ~96px) */}
-          <div className="pt-24">
+          {/* push content below fixed navbar (top bar ~48px + tab bar ~40px) */}
+          <div className="pt-[88px]">
             {children}
           </div>
 

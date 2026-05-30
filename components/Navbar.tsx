@@ -96,7 +96,7 @@ export function Navbar() {
     <>
       {/* ── Top bar: Logo + Wallet ─────────────────────────────────────── */}
       <div
-        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-3"
+        className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-2.5"
         style={{
           background: "rgba(13, 0, 21, 0.9)",
           backdropFilter: "blur(20px)",
@@ -111,12 +111,13 @@ export function Navbar() {
 
       {/* ── Nav tabs: below top bar ────────────────────────────────────── */}
       <div
-        className="fixed top-[52px] left-0 right-0 z-40 flex items-center gap-1 px-3 py-2 overflow-x-auto"
+        className="fixed top-[48px] left-0 right-0 z-40 flex items-center gap-1 px-3 py-2 overflow-x-auto"
         style={{
           background: "rgba(13, 0, 21, 0.85)",
           backdropFilter: "blur(16px)",
           borderBottom: "1px solid rgba(168, 85, 247, 0.1)",
-          scrollbarWidth: "none"
+          scrollbarWidth: "none",
+          msOverflowStyle: "none"
         }}
       >
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
