@@ -134,7 +134,7 @@ export function SwapCard() {
               inputMode="decimal"
               placeholder="0"
               value={amountIn}
-              onChange={e => { setAmountIn(sanitizeAmountInput(e.target.value)); reset(); }}
+              onChange={e => { setAmountIn(sanitizeAmountInput(e.target.value, tokenIn.decimals)); reset(); }}
               className="min-w-0 flex-1 bg-transparent text-xl sm:text-2xl font-semibold text-textPrimary outline-none placeholder:opacity-30"
             />
             <TokenSelector
@@ -215,10 +215,16 @@ export function SwapCard() {
               <Image src={tokenOut.icon} alt={tokenOut.symbol} width={14} height={14} />
               <span className="text-textPrimary font-medium">
                 {amountOut && amountIn && Number(amountIn) > 0
-                  ? (Number(amountOut) / Number(amountIn)).toFixed(4)
+                  ? (Number(amountOut) / Number(amountIn)).toFixed(tokenOut.decimals > 6 ? 8 : 4)
                   : "—"} {tokenOut.symbol}
               </span>
             </div>
+            {/* USD value of sell amount */}
+            {amountIn && Number(amountIn) > 0 && (
+              <span style={{ color: "rgba(192,132,252,0.45)" }}>
+                ≈ ${(Number(amountIn) * tokenIn.usdPrice).toLocaleString("en-US", { maximumFractionDigits: 2 })}
+              </span>
+            )}
           </div>
         )}
 

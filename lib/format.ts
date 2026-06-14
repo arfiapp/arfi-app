@@ -34,9 +34,11 @@ export function formatAmountForKit(amount: string): string {
   return n.toFixed(6);
 }
 
-export function sanitizeAmountInput(value: string): string {
+export function sanitizeAmountInput(value: string, maxDecimals = 8): string {
   const cleaned = value.replace(/[^0-9.]/g, "");
   const parts = cleaned.split(".");
   if (parts.length <= 1) return cleaned;
-  return `${parts[0]}.${parts.slice(1).join("")}`;
+  // Limit decimal places based on token
+  const decimals = parts[1].slice(0, maxDecimals);
+  return `${parts[0]}.${decimals}`;
 }
