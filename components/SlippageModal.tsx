@@ -2,7 +2,7 @@
 
 import { X } from "lucide-react";
 
-const PRESETS = [50, 100, 200];
+const PRESETS = [100, 500, 1000]; // 1%, 5%, 10%
 
 type Props = {
   open: boolean;

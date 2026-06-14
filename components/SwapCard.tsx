@@ -30,7 +30,7 @@ export function SwapCard() {
   const [tokenInSymbol, setTokenInSymbol]   = useState<SwapTokenSymbol>("USDC");
   const [tokenOutSymbol, setTokenOutSymbol] = useState<SwapTokenSymbol>("EURC");
   const [amountIn, setAmountIn]             = useState("");
-  const [slippageBps, setSlippageBps]       = useState(100);
+  const [slippageBps, setSlippageBps] = useState(1000); // default 10%
   const [slippageOpen, setSlippageOpen]     = useState(false);
   const [flipped, setFlipped]               = useState(false);
 
