@@ -276,7 +276,7 @@ async function executeAppKit(req: SwapRequest): Promise<SwapResult> {
   });
 
   // Safely extract txHash — App Kit result shape may vary
-  const r = result as Record<string, unknown>;
+  const r = result as unknown as Record<string, unknown>;
   const hash = (
     (typeof r.transactionHash === "string" ? r.transactionHash : undefined) ??
     (typeof r.txHash          === "string" ? r.txHash          : undefined) ??
