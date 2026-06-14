@@ -14,8 +14,8 @@ const NAV_ITEMS = [
   { href: "/swap",        label: "Swap",        icon: ArrowLeftRight },
   { href: "/bridge",      label: "Bridge",      icon: Shuffle        },
   { href: "/send",        label: "Send",        icon: Send           },
-  { href: "/portfolio",   label: "Portfolio",   icon: BarChart3      },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy         },
+  { href: "/portfolio",   label: "Portfolio",   icon: BarChart3      },
 ];
 
 function shortenAddress(addr: string) {

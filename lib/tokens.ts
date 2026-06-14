@@ -1,5 +1,5 @@
 /** Arc Testnet — docs.arc.io/arc/references/contract-addresses */
-export type SwapTokenSymbol = "USDC" | "EURC";
+export type SwapTokenSymbol = "USDC" | "EURC" | "cirBTC";
 
 export type TokenInfo = {
   symbol: SwapTokenSymbol;
@@ -7,7 +7,7 @@ export type TokenInfo = {
   address: `0x${string}`;
   decimals: number;
   icon: string;
-  /** Supported for swap via Circle App Kit on Arc Testnet */
+  /** Supported for swap via XyloRouter on Arc Testnet */
   swappable: boolean;
 };
 
@@ -27,6 +27,14 @@ export const TOKENS: TokenInfo[] = [
     decimals: 6,
     icon: "/icons/eurc.svg",
     swappable: true
+  },
+  {
+    symbol: "cirBTC",
+    name: "Circle Wrapped Bitcoin",
+    address: "0xf0C4a4CE82A5746AbAAd9425360Ab04fbBA432BF",
+    decimals: 8,
+    icon: "/icons/cirbtc.svg",
+    swappable: false   // XyloRouter has no cirBTC liquidity pool on Arc Testnet
   }
 ];
 

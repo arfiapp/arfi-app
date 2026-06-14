@@ -17,9 +17,11 @@ export function TokenSelector({ selected, onSelect, disabled }: Props) {
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
+    // Only show swappable tokens
+    const swappable = TOKENS.filter(t => t.swappable);
     const q = query.trim().toLowerCase();
-    if (!q) return TOKENS;
-    return TOKENS.filter(t => t.symbol.toLowerCase().includes(q) || t.name.toLowerCase().includes(q));
+    if (!q) return swappable;
+    return swappable.filter(t => t.symbol.toLowerCase().includes(q) || t.name.toLowerCase().includes(q));
   }, [query]);
 
   return (
