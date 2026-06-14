@@ -45,7 +45,7 @@ export const PORTFOLIO_TOKENS: PortfolioToken[] = [
     address: "0xf0C4a4CE82A5746AbAAd9425360Ab04fbBA432BF",
     decimals: 8,
     icon: "",          // no icon file — use letter avatar
-    color: "#f59e0b",
+    color: "#7c3aed",  // purple-to-blue gradient (matches cirBTC brand)
     usdPrice: 105000, // approximate BTC/USD
   },
 ];
