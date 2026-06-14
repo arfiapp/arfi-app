@@ -36,11 +36,7 @@ export function useSwap() {
 
         setStatus("success");
         setTxHash(hash);
-        setMessage(
-          hash
-            ? `Swap completed successfully. ArcScan: ${arcTxUrl(hash)}`
-            : "Swap completed successfully."
-        );
+        setMessage("Swap completed successfully.");
         toast.success("Swap complete!", { id: toastId, duration: 5000 });
 
         return result;

@@ -19,7 +19,11 @@ const Navbar = dynamic(
 
 export const metadata: Metadata = {
   title: "Arfi — Stablecoin DeFi on Arc Testnet",
-  description: "Swap, Bridge, Send and track your portfolio on Arc Testnet"
+  description: "Swap, Bridge, Send and track your portfolio on Arc Testnet",
+  icons: {
+    icon: "/favicon.jpeg",
+    apple: "/favicon.jpeg",
+  }
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

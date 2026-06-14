@@ -286,24 +286,35 @@ export function SwapCard() {
 
         {/* Status message */}
         {status !== "idle" && message && (
-          <p className={`mt-3 text-center text-xs ${
-            status === "error" ? "text-red-400" : status === "success" ? "text-purple-300" : "text-textSecondary"
-          }`}>
-            {message}
+          <div className={`mt-3 flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-xs ${
+            status === "error"
+              ? "text-red-400"
+              : status === "success"
+              ? "text-green-400"
+              : "text-textSecondary"
+          }`}
+          style={{
+            background: status === "error"
+              ? "rgba(239,68,68,0.08)"
+              : status === "success"
+              ? "rgba(34,197,94,0.08)"
+              : "rgba(168,85,247,0.08)",
+            border: `1px solid ${status === "error" ? "rgba(239,68,68,0.2)" : status === "success" ? "rgba(34,197,94,0.2)" : "rgba(168,85,247,0.15)"}`
+          }}>
+            <span className="truncate">
+              {status === "success" ? "Swap completed successfully" : message}
+            </span>
             {txHash && (
-              <>
-                {" "}
-                <a
-                  href={`https://testnet.arcscan.app/tx/${txHash}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline"
-                >
-                  View on ArcScan
-                </a>
-              </>
+              <a
+                href={`https://testnet.arcscan.app/tx/${txHash}`}
+                target="_blank"
+                rel="noreferrer"
+                className="shrink-0 underline hover:opacity-80 transition-opacity"
+              >
+                ArcScan ↗
+              </a>
             )}
-          </p>
+          </div>
         )}
       </div>
 
