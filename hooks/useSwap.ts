@@ -7,6 +7,7 @@ import { toUserMessage } from "@/lib/errors";
 import { arcTxUrl } from "@/lib/arc-chain";
 import type { SwapTokenSymbol } from "@/lib/tokens";
 import type { EIP1193Provider } from "viem";
+import { recordActivity } from "@/lib/supabase";
 
 export type SwapStatus = "idle" | "loading" | "success" | "error";
 
@@ -38,6 +39,9 @@ export function useSwap() {
         setTxHash(hash);
         setMessage("Swap completed successfully.");
         toast.success("Swap complete!", { id: toastId, duration: 5000 });
+
+        // Record points
+        void recordActivity(params.address, "swap", hash ?? "");
 
         return result;
       } catch (e) {

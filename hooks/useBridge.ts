@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { executeBridge, type BridgeStatus, type BridgeResult } from "@/lib/bridge";
 import type { CctpChain } from "@/lib/cctp-chains";
 import type { EIP1193Provider } from "viem";
+import { recordActivity } from "@/lib/supabase";
 
 export type BridgeState = {
   status: BridgeStatus;
@@ -47,6 +48,9 @@ export function useBridge() {
       });
 
       toast.success("Bridge complete!", { id: toastId, duration: 6000 });
+
+      // Record points
+      void recordActivity(params.address, "bridge", result.mintTxHash);
       return result;
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Bridge failed.";

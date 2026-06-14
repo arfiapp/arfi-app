@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { sendTokens, type SendResult } from "@/lib/send";
 import type { PortfolioToken } from "@/lib/portfolio-tokens";
 import type { EIP1193Provider } from "viem";
+import { recordActivity } from "@/lib/supabase";
 
 export type SendStatus = "idle" | "loading" | "success" | "error";
 
@@ -33,6 +34,9 @@ export function useSend() {
       setTxHash(result.txHash);
       setMessage(`Sent ${result.amount} ${result.symbol} successfully.`);
       toast.success(`Sent ${result.amount} ${result.symbol}!`, { id: toastId, duration: 5000 });
+
+      // Record points
+      void recordActivity(params.from, "send", result.txHash);
 
       return result;
     } catch (e) {
