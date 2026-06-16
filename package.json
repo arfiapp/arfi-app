@@ -13,7 +13,6 @@
   "dependencies": {
     "@circle-fin/adapter-viem-v2": "latest",
     "@circle-fin/app-kit": "latest",
-    "@google/genai": "^2.8.0",
     "@rainbow-me/rainbowkit": "^2.2.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@supabase/supabase-js": "^2.108.1",
@@ -21,6 +20,7 @@
     "framer-motion": "^11.15.0",
     "lucide-react": "^0.468.0",
     "next": "^14.2.30",
+    "openai": "^6.42.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
