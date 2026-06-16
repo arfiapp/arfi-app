@@ -44,7 +44,7 @@ export default function AgentPage() {
     {
       id: nextId(),
       role: "agent",
-      content: "Merhaba! Ben arfi.finance AI Asistanıyım. Doğal dilde swap talimatı verebilirsin. Örn: \"1 USDC'yi EURC'ye çevir\"",
+      content: "Hi! I'm the arfi.finance AI Assistant. You can give me swap instructions in natural language. e.g. \"Swap 1 USDC to EURC\"",
     },
   ]);
   const [input,   setInput]   = useState("");
@@ -177,7 +177,7 @@ export default function AgentPage() {
             <div>
               <h1 className="font-display text-2xl font-bold text-textPrimary">AI Agent</h1>
               <p className="text-xs" style={{ color: "rgba(192,132,252,0.5)" }}>
-                Doğal dilde swap yap · Örn: &quot;1 USDC&apos;yi EURC&apos;ye çevir&quot;
+                Swap in natural language · e.g. &quot;Swap 1 USDC to EURC&quot;
               </p>
             </div>
           </div>
@@ -186,12 +186,12 @@ export default function AgentPage() {
           {!isConnected && (
             <div className="mt-3 flex items-center justify-between rounded-xl px-4 py-3"
               style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}>
-              <p className="text-xs text-amber-300">Swap yapabilmek için cüzdanını bağla.</p>
+              <p className="text-xs text-amber-300">Connect your wallet to execute swaps.</p>
               <ConnectButton.Custom>
                 {({ openConnectModal, mounted }) =>
                   mounted ? (
                     <button type="button" onClick={openConnectModal} className="wallet-btn-primary text-xs px-3 py-1.5">
-                      Bağlan
+                      Connect
                     </button>
                   ) : null
                 }
@@ -291,7 +291,7 @@ export default function AgentPage() {
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void handleSend(input); } }}
             disabled={loading}
-            className="flex-1 bg-transparent text-sm text-textPrimary outline-none placeholder:opacity-30"
+            placeholder="e.g. Swap 1 USDC to EURC…"
           />
           <button
             type="button"
