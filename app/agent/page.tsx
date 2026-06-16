@@ -286,12 +286,11 @@ export default function AgentPage() {
           <ArrowLeftRight className="h-4 w-4 shrink-0" style={{ color: "rgba(168,85,247,0.5)" }} />
           <input
             type="text"
-            placeholder="Örn: 1 USDC'yi EURC'ye çevir…"
+            placeholder="e.g. Swap 1 USDC to EURC…"
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void handleSend(input); } }}
             disabled={loading}
-            placeholder="e.g. Swap 1 USDC to EURC…"
           />
           <button
             type="button"
