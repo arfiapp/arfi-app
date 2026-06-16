@@ -12,11 +12,11 @@ import { useState } from "react";
 
 const NAV_ITEMS = [
   { href: "/swap",        label: "Swap",        icon: ArrowLeftRight },
+  { href: "/agent",       label: "AI Agent",    icon: Bot            },
   { href: "/bridge",      label: "Bridge",      icon: Shuffle        },
   { href: "/send",        label: "Send",        icon: Send           },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy         },
   { href: "/portfolio",   label: "Portfolio",   icon: BarChart3      },
-  { href: "/agent",       label: "AI Agent",    icon: Bot            },
 ];
 
 function shortenAddress(addr: string) {

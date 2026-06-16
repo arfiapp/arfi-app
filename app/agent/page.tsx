@@ -319,11 +319,11 @@ export default function AgentPage() {
 
   return (
     <main
-      className="flex min-h-[calc(100vh-3.5rem)] flex-col px-4 py-6"
-      style={{ maxWidth: 760, margin: "0 auto" }}
+      className="flex flex-col px-4 py-6"
+      style={{ maxWidth: 760, margin: "0 auto", height: "calc(100vh - 3.5rem)" }}
     >
       {/* Header */}
-      <div className="mb-6">
+      <div className="shrink-0 mb-4">
         <h1 className="font-display text-3xl font-bold" style={{ color: "#a855f7" }}>
           AI Agent
         </h1>
@@ -349,8 +349,11 @@ export default function AgentPage() {
         )}
       </div>
 
-      {/* Chat messages */}
-      <div className="flex-1 space-y-4 mb-4 overflow-y-auto" style={{ minHeight: 300 }}>
+      {/* Scrollable chat area */}
+      <div
+        className="flex-1 overflow-y-auto space-y-4 pr-1"
+        style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(168,85,247,0.3) transparent" }}
+      >
         {messages.map(msg => (
           <div key={msg.id}
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -403,7 +406,7 @@ export default function AgentPage() {
       </div>
 
       {/* Example prompts */}
-      <div className="mb-3 flex flex-wrap gap-2">
+      <div className="shrink-0 mt-3 mb-3 flex flex-wrap gap-2">
         {EXAMPLE_PROMPTS.map(p => (
           <button key={p} type="button"
             disabled={loading}
@@ -417,7 +420,7 @@ export default function AgentPage() {
 
       {/* Input bar */}
       <div
-        className="flex items-center gap-3 rounded-2xl px-4 py-3"
+        className="shrink-0 flex items-center gap-3 rounded-2xl px-4 py-3"
         style={{ background: "rgba(15,0,30,0.9)", border: "1px solid rgba(168,85,247,0.25)" }}
       >
         <input
