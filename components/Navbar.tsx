@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ArrowLeftRight, Shuffle, Send, BarChart3, Trophy } from "lucide-react";
+import { ArrowLeftRight, Shuffle, Send, BarChart3, Trophy, Bot } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useChainId, useDisconnect } from "wagmi";
 import { arcTestnet } from "@/lib/arc-chain";
@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { href: "/send",        label: "Send",        icon: Send           },
   { href: "/leaderboard", label: "Leaderboard", icon: Trophy         },
   { href: "/portfolio",   label: "Portfolio",   icon: BarChart3      },
+  { href: "/agent",       label: "AI Agent",    icon: Bot            },
 ];
 
 function shortenAddress(addr: string) {

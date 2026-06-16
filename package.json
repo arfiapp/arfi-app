@@ -13,6 +13,7 @@
   "dependencies": {
     "@circle-fin/adapter-viem-v2": "latest",
     "@circle-fin/app-kit": "latest",
+    "@google/generative-ai": "^0.24.1",
     "@rainbow-me/rainbowkit": "^2.2.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@supabase/supabase-js": "^2.108.1",

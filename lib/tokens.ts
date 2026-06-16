@@ -47,7 +47,7 @@ export const TOKENS: TokenInfo[] = [
     address: "0xf0C4a4CE82A5746AbAAd9425360Ab04fbBA432BF",
     decimals: 8,
     icon: "/icons/cirbtc.svg",
-    swappable: true,
+    swappable: false,  // Circle App Kit "No route available" on Arc Testnet — pending liquidity
     usdPrice: 105_000,
   },
 ];
