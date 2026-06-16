@@ -10,7 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -84,14 +84,17 @@ export async function POST(req: NextRequest): Promise<NextResponse<AgentResponse
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
+    const ai = new GoogleGenAI({ apiKey });
+
+    const response = await ai.models.generateContent({
       model: "gemini-2.0-flash",
-      systemInstruction: SYSTEM_PROMPT,
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
+      },
+      contents: userMessage,
     });
 
-    const result = await model.generateContent(userMessage);
-    const text   = result.response.text().trim();
+    const text = (response.text ?? "").trim();
 
     // Strip markdown code fences if present
     const cleaned = text.replace(/^```(?:json)?\n?/i, "").replace(/\n?```$/i, "").trim();
