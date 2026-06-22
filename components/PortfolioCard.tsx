@@ -5,7 +5,7 @@ import { useAccount } from "wagmi";
 import { useEffect, useState } from "react";
 import { usePortfolio } from "@/hooks/usePortfolio";
 import { DonutChart } from "./DonutChart";
-import { fetchActivities, type ActivityEntry } from "@/lib/supabase";
+import { fetchOnChainTxs, type OnChainTx } from "@/lib/supabase";
 
 function formatUsd(val: number): string {
   if (val === 0) return "$0.00";
@@ -31,6 +31,10 @@ function shortenHash(hash: string): string {
   return `${hash.slice(0, 8)}…${hash.slice(-6)}`;
 }
 
+function shortenAddr(addr: string): string {
+  return `${addr.slice(0, 6)}…${addr.slice(-4)}`;
+}
+
 const TYPE_CONFIG: Record<string, { label: string; Icon: React.ElementType; color: string }> = {
   swap:   { label: "Swap",   Icon: ArrowLeftRight, color: "#a855f7" },
   bridge: { label: "Bridge", Icon: Shuffle,        color: "#3b82f6" },
@@ -39,33 +43,43 @@ const TYPE_CONFIG: Record<string, { label: string; Icon: React.ElementType; colo
 
 const PAGE_SIZE = 5;
 
-function TransactionHistory({ address }: { address: string }) {
-  const [activities, setActivities] = useState<ActivityEntry[]>([]);
-  const [total,      setTotal]      = useState(0);
-  const [page,       setPage]       = useState(1);
-  const [loading,    setLoading]    = useState(true);
+function getTxLabel(tx: OnChainTx, myAddress: string): { label: string; Icon: React.ElementType; color: string } {
+  const method = (tx.method ?? "").toLowerCase();
+  if (method.includes("swap"))      return TYPE_CONFIG.swap;
+  if (method.includes("bridge") || method.includes("burn") || method.includes("deposit") || method.includes("mint") || method.includes("receive"))
+    return TYPE_CONFIG.bridge;
+  if (method.includes("transfer") || method.includes("send"))
+    return TYPE_CONFIG.send;
+  // fallback: outgoing = send, incoming = receive
+  if (tx.from.toLowerCase() === myAddress.toLowerCase())
+    return { label: "Send", Icon: Send, color: "#10b981" };
+  return { label: "Receive", Icon: ArrowLeftRight, color: "#a855f7" };
+}
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+function TransactionHistory({ address }: { address: string }) {
+  const [txs,         setTxs]         = useState<OnChainTx[]>([]);
+  const [total,       setTotal]       = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const [page,        setPage]        = useState(1);
+  const [loading,     setLoading]     = useState(true);
+  const [error,       setError]       = useState<string | null>(null);
 
   const load = async (p: number) => {
     setLoading(true);
-    const result = await fetchActivities(address, p, PAGE_SIZE);
-    setActivities(result.data);
+    setError(null);
+    const result = await fetchOnChainTxs(address, p, PAGE_SIZE);
+    if (result.data.length === 0 && p === 1) {
+      setError("No transactions found on Arc Testnet for this address.");
+    }
+    setTxs(result.data);
     setTotal(result.total);
+    setHasNextPage(result.hasNextPage);
     setLoading(false);
   };
 
   useEffect(() => { void load(page); }, [page, address]);
 
-  function pageNumbers(): (number | "…")[] {
-    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
-    const pages: (number | "…")[] = [1];
-    if (page > 3) pages.push("…");
-    for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i);
-    if (page < totalPages - 2) pages.push("…");
-    pages.push(totalPages);
-    return pages;
-  }
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <div className="glass-card overflow-hidden">
@@ -93,16 +107,22 @@ function TransactionHistory({ address }: { address: string }) {
         <div className="flex items-center justify-center py-10">
           <RefreshCw className="h-5 w-5 animate-spin" style={{ color: "rgba(168,85,247,0.5)" }} />
         </div>
-      ) : activities.length === 0 ? (
+      ) : error ? (
         <div className="py-10 text-center text-sm" style={{ color: "rgba(192,132,252,0.4)" }}>
-          No transactions yet.
+          {error}
+        </div>
+      ) : txs.length === 0 ? (
+        <div className="py-10 text-center text-sm" style={{ color: "rgba(192,132,252,0.4)" }}>
+          No transactions found.
         </div>
       ) : (
-        activities.map((tx) => {
-          const cfg = TYPE_CONFIG[tx.type] ?? TYPE_CONFIG.swap;
+        txs.map((tx) => {
+          const cfg = getTxLabel(tx, address);
+          const isOut = tx.from.toLowerCase() === address.toLowerCase();
+          const counterpart = isOut ? tx.to : tx.from;
           return (
             <div
-              key={tx.id}
+              key={tx.hash}
               className="flex items-center gap-3 px-5 py-3.5"
               style={{ borderBottom: "1px solid rgba(168,85,247,0.06)" }}
             >
@@ -116,40 +136,49 @@ function TransactionHistory({ address }: { address: string }) {
 
               {/* Info */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <span className="text-sm font-semibold text-textPrimary">{cfg.label}</span>
-                  <span
-                    className="rounded px-1.5 py-0.5 text-[10px] font-bold"
-                    style={{ background: `${cfg.color}20`, color: cfg.color }}
-                  >
-                    +{tx.points} pts
-                  </span>
+                  {tx.status === "error" && (
+                    <span className="rounded px-1.5 py-0.5 text-[10px] font-bold"
+                      style={{ background: "rgba(239,68,68,0.15)", color: "#f87171" }}>
+                      Failed
+                    </span>
+                  )}
+                  {counterpart && (
+                    <span className="text-xs font-mono" style={{ color: "rgba(192,132,252,0.45)" }}>
+                      {isOut ? "→" : "←"} {shortenAddr(counterpart)}
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs mt-0.5" style={{ color: "rgba(192,132,252,0.45)" }}>
-                  {formatDate(tx.created_at)}
+                  {formatDate(tx.timestamp)}
+                  {tx.method && (
+                    <span className="ml-2 rounded px-1 py-0.5 text-[10px]"
+                      style={{ background: "rgba(168,85,247,0.1)", color: "rgba(192,132,252,0.6)" }}>
+                      {tx.method}
+                    </span>
+                  )}
                 </p>
               </div>
 
               {/* Tx hash link */}
-              {tx.tx_hash && tx.tx_hash !== "" && (
-                <a
-                  href={`https://testnet.arcscan.app/tx/${tx.tx_hash}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex items-center gap-1 text-xs font-mono transition hover:opacity-80 shrink-0"
-                  style={{ color: "rgba(192,132,252,0.5)" }}
-                >
-                  {shortenHash(tx.tx_hash)}
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              )}
+              <a
+                href={`https://testnet.arcscan.app/tx/${tx.hash}`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1 text-xs font-mono transition hover:opacity-80 shrink-0"
+                style={{ color: "rgba(192,132,252,0.5)" }}
+              >
+                {shortenHash(tx.hash)}
+                <ExternalLink className="h-3 w-3" />
+              </a>
             </div>
           );
         })
       )}
 
       {/* Pagination */}
-      {!loading && totalPages > 1 && (
+      {!loading && (hasNextPage || page > 1) && (
         <div className="flex flex-col items-center gap-2 px-5 py-3"
           style={{ borderTop: "1px solid rgba(168,85,247,0.1)" }}>
           <div className="flex items-center gap-1 flex-wrap justify-center">
@@ -163,29 +192,25 @@ function TransactionHistory({ address }: { address: string }) {
               <ChevronLeft className="h-3.5 w-3.5" />Prev
             </button>
 
-            {pageNumbers().map((n, idx) =>
-              n === "…" ? (
-                <span key={`e-${idx}`} className="flex h-7 w-5 items-center justify-center text-xs"
-                  style={{ color: "rgba(192,132,252,0.4)" }}>…</span>
-              ) : (
-                <button
-                  key={n}
-                  type="button"
-                  onClick={() => setPage(n as number)}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg text-xs font-semibold transition"
-                  style={
-                    n === page
-                      ? { background: "rgba(168,85,247,0.3)", color: "#f3e8ff", border: "1px solid rgba(168,85,247,0.5)" }
-                      : { color: "rgba(192,132,252,0.6)", border: "1px solid rgba(168,85,247,0.15)" }
-                  }
-                >{n}</button>
-              )
-            )}
+            {/* Show current page number, and next if exists */}
+            {[page - 1, page, page + 1].filter(n => n >= 1 && (n < page + 1 || hasNextPage)).map(n => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setPage(n)}
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-xs font-semibold transition"
+                style={
+                  n === page
+                    ? { background: "rgba(168,85,247,0.3)", color: "#f3e8ff", border: "1px solid rgba(168,85,247,0.5)" }
+                    : { color: "rgba(192,132,252,0.6)", border: "1px solid rgba(168,85,247,0.15)" }
+                }
+              >{n}</button>
+            ))}
 
             <button
               type="button"
-              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-              disabled={page === totalPages}
+              onClick={() => setPage(p => p + 1)}
+              disabled={!hasNextPage}
               className="flex items-center h-7 px-2 rounded-lg text-xs font-medium transition disabled:opacity-30"
               style={{ color: "rgba(192,132,252,0.7)", border: "1px solid rgba(168,85,247,0.2)" }}
             >
@@ -193,7 +218,7 @@ function TransactionHistory({ address }: { address: string }) {
             </button>
           </div>
           <span className="text-xs" style={{ color: "rgba(192,132,252,0.45)" }}>
-            Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} of {total} transactions
+            Page {page} · {PAGE_SIZE} per page
           </span>
         </div>
       )}
