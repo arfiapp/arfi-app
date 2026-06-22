@@ -36,24 +36,51 @@ function shortenAddr(addr: string): string {
 }
 
 const TYPE_CONFIG: Record<string, { label: string; Icon: React.ElementType; color: string }> = {
-  swap:   { label: "Swap",   Icon: ArrowLeftRight, color: "#a855f7" },
-  bridge: { label: "Bridge", Icon: Shuffle,        color: "#3b82f6" },
-  send:   { label: "Send",   Icon: Send,           color: "#10b981" },
+  swap:    { label: "Swap",    Icon: ArrowLeftRight, color: "#a855f7" },
+  bridge:  { label: "Bridge",  Icon: Shuffle,        color: "#3b82f6" },
+  send:    { label: "Send",    Icon: Send,           color: "#10b981" },
+  receive: { label: "Receive", Icon: ArrowLeftRight, color: "#f59e0b" },
 };
 
 const PAGE_SIZE = 5;
 
+// Known Arc Testnet contract addresses for tx type detection
+const KNOWN_CONTRACTS: Record<string, "swap" | "bridge" | "send"> = {
+  // XyloNet DEX Router
+  "0x73742278c31a76dbb0d2587d03ef92e6e2141023": "swap",
+  // Circle CCTP TokenMessengerV2
+  "0x8fe6b999dc680ccfdd5bf7eb0974218be2542daa": "bridge",
+  // Circle CCTP MessageTransmitterV2
+  "0xe737e5cebeeba77efe34d4aa090756590b1ce275": "bridge",
+  // USDC ERC-20
+  "0x3600000000000000000000000000000000000000": "send",
+  // EURC ERC-20
+  "0x89b50855aa3be2f677cd6303cec089b5f319d72a": "send",
+  // cirBTC ERC-20
+  "0xf0c4a4ce82a5746abaad9425360ab04fbba432bf": "send",
+};
+
 function getTxLabel(tx: OnChainTx, myAddress: string): { label: string; Icon: React.ElementType; color: string } {
   const method = (tx.method ?? "").toLowerCase();
-  if (method.includes("swap"))      return TYPE_CONFIG.swap;
-  if (method.includes("bridge") || method.includes("burn") || method.includes("deposit") || method.includes("mint") || method.includes("receive"))
+
+  // 1. Method name hint (when available)
+  if (method.includes("swap"))   return TYPE_CONFIG.swap;
+  if (method.includes("bridge") || method.includes("burn") || method.includes("deposit") ||
+      method.includes("mint")   || method.includes("receive"))
     return TYPE_CONFIG.bridge;
-  if (method.includes("transfer") || method.includes("send"))
-    return TYPE_CONFIG.send;
-  // fallback: outgoing = send, incoming = receive
-  if (tx.from.toLowerCase() === myAddress.toLowerCase())
-    return { label: "Send", Icon: Send, color: "#10b981" };
-  return { label: "Receive", Icon: ArrowLeftRight, color: "#a855f7" };
+
+  // 2. Known contract address match
+  const toAddr = (tx.to ?? "").toLowerCase();
+  const contractType = KNOWN_CONTRACTS[toAddr];
+  if (contractType) return TYPE_CONFIG[contractType];
+
+  // 3. Incoming tx
+  if (tx.from.toLowerCase() !== myAddress.toLowerCase()) {
+    return { label: "Receive", Icon: ArrowLeftRight, color: "#a855f7" };
+  }
+
+  // 4. Fallback — outgoing plain transfer
+  return { label: "Send", Icon: Send, color: "#10b981" };
 }
 
 function TransactionHistory({ address }: { address: string }) {
