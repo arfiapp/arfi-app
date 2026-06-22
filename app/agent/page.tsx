@@ -36,7 +36,6 @@ type SwapPreviewData = {
 const EXAMPLE_PROMPTS = [
   "Swap 1 USDC to EURC",
   "Swap 2 USDC to cirBTC",
-  "How can it be installed in ARC Network?",
   "What is ARC Network?",
 ];
 
