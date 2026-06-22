@@ -74,6 +74,44 @@ export async function recordActivity(
   });
 }
 
+// ── Activity entry type ───────────────────────────────────────────────────────
+
+export type ActivityEntry = {
+  id:         string;
+  address:    string;
+  type:       ActivityType;
+  points:     number;
+  tx_hash:    string;
+  created_at: string;
+};
+
+// ── Fetch activities for a wallet ─────────────────────────────────────────────
+
+export async function fetchActivities(
+  address: string,
+  page = 1,
+  pageSize = 5
+): Promise<{ data: ActivityEntry[]; total: number }> {
+  if (!supabaseUrl || !supabaseKey) return { data: [], total: 0 };
+
+  const from = (page - 1) * pageSize;
+  const to   = from + pageSize - 1;
+
+  const { data, error, count } = await supabase
+    .from("activities")
+    .select("*", { count: "exact" })
+    .eq("address", address.toLowerCase())
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (error) {
+    console.error("fetchActivities error:", error);
+    return { data: [], total: 0 };
+  }
+
+  return { data: (data ?? []) as ActivityEntry[], total: count ?? 0 };
+}
+
 // ── Fetch leaderboard ─────────────────────────────────────────────────────────
 
 export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
