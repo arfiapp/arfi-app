@@ -79,16 +79,40 @@ export async function recordActivity(
 export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
   if (!supabaseUrl || !supabaseKey) return [];
 
-  const { data, error } = await supabase
+  // First get total count
+  const { count } = await supabase
     .from("leaderboard")
-    .select("*")
-    .order("total_points", { ascending: false })
-    .limit(100);
+    .select("*", { count: "exact", head: true });
 
-  if (error) {
-    console.error("Leaderboard fetch error:", error);
-    return [];
+  console.log("[leaderboard] total rows in DB:", count);
+
+  const all: LeaderboardEntry[] = [];
+  const PAGE = 100; // stay within Supabase default max per request
+
+  let from = 0;
+  const total = count ?? 10000;
+
+  while (from < total) {
+    const { data, error } = await supabase
+      .from("leaderboard")
+      .select("*")
+      .order("total_points", { ascending: false })
+      .range(from, from + PAGE - 1);
+
+    if (error) {
+      console.error("[leaderboard] fetch error at range", from, error);
+      break;
+    }
+
+    if (!data || data.length === 0) break;
+
+    all.push(...data);
+    console.log(`[leaderboard] fetched rows ${from}–${from + data.length - 1}, total so far: ${all.length}`);
+
+    if (data.length < PAGE) break;
+    from += PAGE;
   }
 
-  return data ?? [];
+  console.log("[leaderboard] final count returned:", all.length);
+  return all;
 }

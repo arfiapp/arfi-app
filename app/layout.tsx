@@ -40,6 +40,20 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           {/* Social icons — fixed bottom-right */}
           <div className="fixed bottom-4 right-4 z-40 flex items-center gap-2 sm:gap-3 sm:bottom-5 sm:right-5">
             <a
+              href="https://home.arfi.finance/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Home"
+              className="social-icon-btn"
+            >
+              {/* Home icon */}
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
+                <path d="M9 21V12h6v9" />
+              </svg>
+            </a>
+
+            <a
               href="https://x.com/arfiapp"
               target="_blank"
               rel="noreferrer"
