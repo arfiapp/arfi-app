@@ -103,61 +103,65 @@ export async function fetchOnChainTxs(
   page = 1,
   pageSize = 5
 ): Promise<{ data: OnChainTx[]; total: number; hasNextPage: boolean }> {
-  // Use local proxy to avoid CORS — falls back to direct if window is undefined (SSR)
-  const base = typeof window !== "undefined"
-    ? `${window.location.origin}/api/arcscan`
-    : "https://testnet.arcscan.app/api";
 
-  const isProxy = typeof window !== "undefined";
-
-  // Fetch up to 50 at once so we can do client-side pagination
-  const limit = 50;
-  const url = isProxy
-    ? `${base}?path=/v2/addresses/${address}/transactions&limit=${limit}&filter=to%20%7C%20from`
-    : `${base}/v2/addresses/${address}/transactions?limit=${limit}&filter=to%20%7C%20from`;
+  // Use local proxy (browser) to avoid CORS; direct URL on server
+  const url = typeof window !== "undefined"
+    ? `${window.location.origin}/api/arcscan?address=${address}&page=${page}&offset=${pageSize}`
+    : `https://testnet.arcscan.app/api?module=account&action=txlist&address=${address}&page=${page}&offset=${pageSize}&sort=desc`;
 
   try {
     const res = await fetch(url, {
       headers: { Accept: "application/json" },
-      signal: AbortSignal.timeout(10_000),
+      signal: AbortSignal.timeout(12_000),
     });
 
     if (!res.ok) return { data: [], total: 0, hasNextPage: false };
 
     const json = await res.json() as {
-      items?: Array<{
-        hash: string;
-        timestamp: string;
-        status: string;
-        method: string | null;
-        value: string;
-        from: { hash: string };
-        to:   { hash: string } | null;
-        fee:  { value: string } | null;
-      }>;
-      next_page_params?: unknown;
+      status: string;
+      message: string;
+      result: Array<{
+        hash:        string;
+        timeStamp:   string;
+        from:        string;
+        to:          string;
+        value:       string;
+        gas:         string;
+        gasPrice:    string;
+        gasUsed:     string;
+        isError:     string;
+        functionName?: string;
+        methodId?:   string;
+      }> | null;
     };
 
-    const all: OnChainTx[] = (json.items ?? []).map(tx => ({
-      hash:      tx.hash,
-      timestamp: tx.timestamp,
-      status:    (tx.status === "ok" ? "ok" : "error") as "ok" | "error",
-      method:    tx.method,
-      value:     tx.value ?? "0",
-      from:      tx.from?.hash ?? "",
-      to:        tx.to?.hash ?? null,
-      fee:       tx.fee?.value ?? "0",
-    }));
+    if (json.status !== "1" || !json.result || json.result.length === 0) {
+      return { data: [], total: 0, hasNextPage: false };
+    }
 
-    const offset      = (page - 1) * pageSize;
-    const page_items  = all.slice(offset, offset + pageSize);
-    const hasNextPage = all.length > offset + pageSize || Boolean(json.next_page_params);
-    const estimatedTotal = hasNextPage
-      ? (page * pageSize) + pageSize
-      : offset + page_items.length;
+    const items: OnChainTx[] = json.result.map(tx => {
+      // Extract method name from functionName (e.g. "swap(address...)" → "swap")
+      const rawMethod = tx.functionName ?? "";
+      const method    = rawMethod ? rawMethod.split("(")[0] : null;
 
-    return { data: page_items, total: estimatedTotal, hasNextPage };
-  } catch {
+      return {
+        hash:      tx.hash,
+        timestamp: new Date(Number(tx.timeStamp) * 1000).toISOString(),
+        status:    tx.isError === "0" ? "ok" : "error",
+        method,
+        value:     tx.value,
+        from:      tx.from,
+        to:        tx.to || null,
+        fee:       String(BigInt(tx.gasUsed) * BigInt(tx.gasPrice)),
+      };
+    });
+
+    // ArcScan returns exactly `offset` items if more exist
+    const hasNextPage = json.result.length >= pageSize;
+
+    return { data: items, total: page * pageSize + (hasNextPage ? 1 : 0), hasNextPage };
+  } catch (e) {
+    console.error("[fetchOnChainTxs] error:", e);
     return { data: [], total: 0, hasNextPage: false };
   }
 }

@@ -1,21 +1,22 @@
 /**
- * GET /api/arcscan?path=/v2/addresses/0x.../transactions&limit=10&filter=...
- * Proxies requests to ArcScan (Blockscout) REST API to avoid CORS issues.
+ * GET /api/arcscan?address=0x...&page=1&offset=5
+ * Proxies requests to ArcScan Etherscan-compatible API to avoid CORS issues.
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const path   = searchParams.get("path") ?? "";
-  const rest   = new URLSearchParams(searchParams);
-  rest.delete("path");
+  const address = searchParams.get("address") ?? "";
+  const page    = searchParams.get("page")    ?? "1";
+  const offset  = searchParams.get("offset")  ?? "5";
 
-  const upstream = `https://testnet.arcscan.app/api${path}?${rest.toString()}`;
+  const upstream =
+    `https://testnet.arcscan.app/api?module=account&action=txlist` +
+    `&address=${address}&page=${page}&offset=${offset}&sort=desc`;
 
   try {
     const res = await fetch(upstream, {
       headers: { Accept: "application/json" },
       signal: AbortSignal.timeout(15_000),
     });
-
     const text = await res.text();
     return new Response(text, {
       status: res.status,
